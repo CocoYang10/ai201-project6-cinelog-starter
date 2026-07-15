@@ -24,19 +24,19 @@ I used Codex to help orient me to the repository, inspect the six review comment
 
 ## Comment 4 — Default visibility
 
-**My position:**
+**My position:** Keep `public=True` as the default for new CineLog watchlist entries.
 
-**Reasoning:**
+**Reasoning:** CineLog is described as a community film-tracking app, so the default should optimize for discovery: friends can immediately see films a user wants to watch and use that information for recommendations or shared viewing plans. Requiring every new entry to be manually published would add friction to the app's core social behavior. This is an intentional product default, not an accidental inheritance from the model.
 
-**Tradeoff acknowledged:**
+**Tradeoff acknowledged:** Public-by-default can expose viewing interests that a user expected to keep personal. A privacy-first product could reasonably choose `public=False`. If we keep the social default, the UI should clearly disclose visibility when a user saves a film and provide an easy private option; the API/model already stores visibility per entry, but that user-facing control is outside this PR. I used AI to challenge this decision; the strongest counterargument was that users may not understand the default, so the disclosure and override are necessary follow-up work.
 
 ## Comment 5 — Sort order
 
-**My position:**
+**My position:** Accept the maintainer's preference and sort by `date_added` descending.
 
-**Reasoning:**
+**Reasoning:** A watchlist is an evolving queue. Recent additions are usually the items a user is currently considering, and newest-first also matches the established behavior of `get_collection()`. Alphabetical order is predictable, but it erases the user's activity context and becomes less useful as the list grows. Alphabetical browsing can be added later as an explicit sort option rather than being the fixed service default.
 
-**Engagement with reviewer's point:**
+**Engagement with reviewer's point:** The reviewer argued that most users want to see what they added recently. I agree that this better reflects the main use case, so I changed `get_watchlist()` to order by `WatchlistEntry.date_added.desc()` and added a test that deliberately uses titles whose alphabetical order is opposite their insertion order. I used AI to stress-test this choice; the main counterargument was deterministic title-based discovery, which is better handled by a selectable sort mode or search.
 
 ## Comment 6 — Rebase
 

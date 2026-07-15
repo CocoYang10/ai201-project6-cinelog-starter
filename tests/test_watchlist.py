@@ -1,5 +1,7 @@
 """Tests for the watchlist service."""
 
+from datetime import datetime, timedelta, timezone
+
 import pytest
 
 from app import create_app, db
@@ -8,6 +10,7 @@ from services.collection_service import FilmNotFoundError
 from services.watchlist_service import (
     AlreadyInWatchlistError,
     add_to_watchlist,
+    get_watchlist,
 )
 
 
@@ -64,3 +67,29 @@ def test_add_to_watchlist_duplicate_raises(app, sample_user, sample_film):
             user_id=sample_user, film_id=sample_film
         ).count()
         assert count == 1
+
+
+def test_get_watchlist_returns_newest_first(app, sample_user):
+    """The watchlist should put the most recently added film first."""
+    with app.app_context():
+        older_film = Film(title="Zodiac", year=2007, genre="Thriller")
+        newer_film = Film(title="Arrival", year=2016, genre="Sci-Fi")
+        db.session.add_all([older_film, newer_film])
+        db.session.commit()
+
+        older_entry = WatchlistEntry(
+            user_id=sample_user,
+            film_id=older_film.id,
+            date_added=datetime.now(timezone.utc) - timedelta(days=1),
+        )
+        newer_entry = WatchlistEntry(
+            user_id=sample_user,
+            film_id=newer_film.id,
+            date_added=datetime.now(timezone.utc),
+        )
+        db.session.add_all([older_entry, newer_entry])
+        db.session.commit()
+
+        watchlist = get_watchlist(sample_user)
+
+        assert [film["title"] for film in watchlist] == ["Arrival", "Zodiac"]
