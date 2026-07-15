@@ -18,9 +18,9 @@ I used Codex to help orient me to the repository, inspect the six review comment
 
 ## Comment 3 — Missing test
 
-**What I did:**
+**What I did:** Created `tests/test_watchlist.py` using the same in-memory app, fixture, and `pytest.raises` structure as `tests/test_collection.py`. The requested test calls `add_to_watchlist()` with an ID that is absent from the database and expects `FilmNotFoundError`. I also included a focused regression test for the deduplication behavior from Comment 2.
 
-**How I verified:**
+**How I verified:** Ran `pytest tests/test_watchlist.py -v` and then `pytest tests/ -v`; both the new tests and the existing collection tests pass.
 
 ## Comment 4 — Default visibility
 
