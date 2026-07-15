@@ -46,6 +46,12 @@ I used Codex to help orient me to the repository, inspect the six review comment
 
 **How I verified no conflict remains:** Confirmed that `git status` contains no unmerged paths, searched for conflict markers and stale integer-ID references, inspected the rebased graph to confirm there are no merge commits above `main`, and ran `pytest tests/ -v` successfully.
 
+### Final Commit History
+
+The following `git log --oneline origin/main..HEAD` output shows eight conventional commits and no merge commits:
+
+![CineLog feature branch commit history](assets/git-log-oneline.png)
+
 ## PR Description
 
 ### Feature overview
