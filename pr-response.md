@@ -12,9 +12,9 @@ I used Codex to help orient me to the repository, inspect the six review comment
 
 ## Comment 2 — Deduplication
 
-**What I did:**
+**What I did:** Added an `AlreadyInWatchlistError` and made `add_to_watchlist()` query for an existing entry with the same `user_id` and `film_id` before inserting. If one exists, the service raises the domain-specific error and does not commit another row. This follows the established `add_to_collection()` pattern.
 
-**How I verified:**
+**How I verified:** Added the same film twice in an isolated test database, confirmed the second call raises `AlreadyInWatchlistError`, and confirmed only one matching row remains. I also ran the full test suite.
 
 ## Comment 3 — Missing test
 
