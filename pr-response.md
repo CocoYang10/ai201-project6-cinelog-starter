@@ -36,7 +36,7 @@ I used Codex to help orient me to the repository, inspect the six review comment
 
 **Reasoning:** A watchlist is an evolving queue. Recent additions are usually the items a user is currently considering, and newest-first also matches the established behavior of `get_collection()`. Alphabetical order is predictable, but it erases the user's activity context and becomes less useful as the list grows. Alphabetical browsing can be added later as an explicit sort option rather than being the fixed service default.
 
-**Engagement with reviewer's point:** The reviewer argued that most users want to see what they added recently. I agree that this better reflects the main use case, so I changed `get_watchlist()` to order by `WatchlistEntry.date_added.desc()` and added a test that deliberately uses titles whose alphabetical order is opposite their insertion order. I used AI to stress-test this choice; the main counterargument was deterministic title-based discovery, which is better handled by a selectable sort mode or search.
+**Engagement with reviewer's point:** The reviewer argued that most users want to see what they added recently. I agree that this better reflects the main use case, so I changed `get_watchlist()` to order by `WatchlistEntry.date_added.desc()` and added a test that deliberately uses titles whose alphabetical order is opposite their insertion order. That test also exposed that the starter branch's `get_watchlist()` referenced `entry.film` without defining the relationship, so I added the missing `WatchlistEntry.film` relationship and reran the suite. I used AI to stress-test this choice; the main counterargument was deterministic title-based discovery, which is better handled by a selectable sort mode or search.
 
 ## Comment 6 — Rebase
 
