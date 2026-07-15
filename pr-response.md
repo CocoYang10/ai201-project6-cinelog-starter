@@ -40,12 +40,29 @@ I used Codex to help orient me to the repository, inspect the six review comment
 
 ## Comment 6 — Rebase
 
-**What conflicted:**
+**What conflicted:** `models.py` conflicted because `main` migrated `Film.id` and `CollectionEntry.film_id` from integers to UUID strings while the feature branch added `WatchlistEntry` from the pre-refactor version of the file.
 
-**How I resolved it:**
+**How I resolved it:** Rebasing preserved the UUID-based `Film` and `CollectionEntry` definitions from `main`, then reintroduced `WatchlistEntry` with `film_id` as `db.String(36)` referencing `film.id`. I also changed the watchlist service and route documentation from integer IDs to UUID strings and changed the nonexistent-film test to use a valid-shaped UUID that is absent from the database.
 
-**How I verified no conflict remains:**
+**How I verified no conflict remains:** Confirmed that `git status` contains no unmerged paths, searched for conflict markers and stale integer-ID references, inspected the rebased graph to confirm there are no merge commits above `main`, and ran `pytest tests/ -v` successfully.
 
 ## PR Description
 
-To be completed after all review comments are addressed.
+### Feature overview
+
+This PR adds a watchlist to CineLog. Users can save a catalog film for later and retrieve their watchlist through REST endpoints. The service rejects nonexistent films and duplicate entries, returns each film with watchlist metadata, and orders results with the newest additions first.
+
+### Design decisions
+
+- New entries remain public by default to support CineLog's community discovery use case. This has a privacy tradeoff, so a clear visibility disclosure and easy private option should be follow-up UI work.
+- Watchlists sort by `date_added` descending because recent intent is more useful for an evolving queue than fixed alphabetical order. Alphabetical sorting can later be offered as an explicit option.
+- Film references use UUID strings, consistent with the refactor now on `main`.
+
+### Manual testing steps
+
+1. Create and activate a virtual environment, then run `pip install -r requirements.txt`.
+2. Run `pytest tests/ -v` and confirm the collection and watchlist tests pass.
+3. Run `python app.py`.
+4. With an existing user and film UUID, POST `{"film_id": "<film-uuid>"}` to `/watchlist/<user-uuid>/add`; confirm a `201` response.
+5. Repeat the same POST and confirm the service rejects the duplicate.
+6. GET `/watchlist/<user-uuid>` and confirm the saved films are returned newest-first with `date_added` and `public` fields.
